@@ -1,108 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-App Launcher</title>
-    <style>
-        body {
-            margin: 0;
-            background: #1e1e1e;
-            color: white;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-        }
-        .desktop {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-        }
-        .app {
-            width: 120px;
-            height: 120px;
-            margin: 10px;
-            background: #333;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-        }
-        .app img {
-            width: 80px;
-            height: 80px;
-            margin-top: 10px;
-        }
-        .window {
-            position: absolute;
-            width: 600px;
-            height: 400px;
-            background: white;
-            border: 1px solid #ccc;
-            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.5);
-            resize: both;
-            overflow: auto;
-        }
-        .window-header {
-            background: #222;
-            color: white;
-            padding: 5px;
-            cursor: move;
-        }
-        .close-btn {
-            float: right;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="desktop">
-        <div class="app" onclick="openApp('https://www.youtube.com')">
-            <img src="youtube-icon.png" alt="YouTube">
-            <p>YouTube</p>
-        </div>
-        <div class="app" onclick="openApp('https://www.tiktok.com')">
-            <img src="tiktok-icon.png" alt="TikTok">
-            <p>TikTok</p>
-        </div>
-        <div class="app" onclick="openApp('https://www.facebook.com')">
-            <img src="facebook-icon.png" alt="Facebook">
-            <p>Facebook</p>
-        </div>
+import { useState, useEffect } from "react";
+import { Rnd } from "react-rnd";
+import { Button } from "@/components/ui/button";
+
+export default function VirtualDesktop() {
+  const [openApps, setOpenApps] = useState([]);
+  const [apps, setApps] = useState([]);
+
+  useEffect(() => {
+    // Fetch apps dynamically (mocking an API response here)
+    const fetchedApps = [
+      { name: "YouTube", url: "https://www.youtube.com" },
+      { name: "TikTok", url: "https://www.tiktok.com" },
+      { name: "Facebook", url: "https://www.facebook.com" },
+      { name: "Twitter", url: "https://twitter.com" },
+      { name: "Instagram", url: "https://www.instagram.com" }
+    ];
+    setApps(fetchedApps);
+  }, []);
+
+  const openApp = (app) => {
+    setOpenApps([...openApps, { id: Date.now(), ...app, x: 50, y: 50, width: 400, height: 300 }]);
+  };
+
+  const closeApp = (id) => {
+    setOpenApps(openApps.filter((app) => app.id !== id));
+  };
+
+  return (
+    <div className="w-screen h-screen bg-gray-900 text-white p-4 relative overflow-hidden">
+      <div className="flex gap-2 mb-4">
+        {apps.map((app) => (
+          <Button key={app.name} onClick={() => openApp(app)}>
+            Open {app.name}
+          </Button>
+        ))}
+      </div>
+
+      {openApps.map((app) => (
+        <Rnd
+          key={app.id}
+          default={{ x: app.x, y: app.y, width: app.width, height: app.height }}
+          bounds="parent"
+          className="absolute bg-white shadow-lg rounded-md overflow-hidden"
+        >
+          <div className="bg-gray-800 text-white flex justify-between p-2 cursor-move">
+            <span>{app.name}</span>
+            <button onClick={() => closeApp(app.id)} className="text-red-500">✖</button>
+          </div>
+          <iframe src={app.url} className="w-full h-full border-none"></iframe>
+        </Rnd>
+      ))}
     </div>
-    
-    <script>
-        function openApp(url) {
-            let windowDiv = document.createElement("div");
-            windowDiv.classList.add("window");
-            windowDiv.innerHTML = `
-                <div class="window-header">
-                    <span class="close-btn" onclick="this.parentElement.parentElement.remove()">✖</span>
-                </div>
-                <iframe src="${url}" width="100%" height="100%"></iframe>
-            `;
-            document.body.appendChild(windowDiv);
-            makeDraggable(windowDiv);
-        }
-        
-        function makeDraggable(element) {
-            let header = element.querySelector(".window-header");
-            let offsetX, offsetY;
-            
-            header.onmousedown = function(event) {
-                offsetX = event.clientX - element.offsetLeft;
-                offsetY = event.clientY - element.offsetTop;
-                document.onmousemove = function(event) {
-                    element.style.left = (event.clientX - offsetX) + "px";
-                    element.style.top = (event.clientY - offsetY) + "px";
-                };
-                document.onmouseup = function() {
-                    document.onmousemove = null;
-                    document.onmouseup = null;
-                };
-            };
-        }
-    </script>
-</body>
-</html>
+  );
+}
