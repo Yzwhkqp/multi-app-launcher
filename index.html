@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-App Launcher</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            text-align: center; 
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            transition: background 0.3s ease;
+            overflow: hidden;
+        }
+        #appContainer { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+            justify-content: center; 
+            margin-top: 20px;
+            position: relative;
+        }
+        .appWrapper { 
+            position: absolute; 
+            display: inline-block; 
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            cursor: grab;
+            resize: both;
+            background: white;
+            transition: transform 0.2s ease;
+            min-width: 200px;
+            min-height: 150px;
+        }
+        .dark-mode {
+            background: #121212;
+            color: white;
+        }
+        button, select {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #ff9800;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 5px;
+        }
+        button:hover { background: #e68900; }
+    </style>
+</head>
+<body>
+    <h1>Multi-App Launcher</h1>
+    <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    <select id="appSelect">
+        <option value="https://www.youtube.com">YouTube</option>
+        <option value="https://www.tiktok.com">TikTok</option>
+        <option value="https://web.whatsapp.com">WhatsApp</option>
+        <option value="https://www.facebook.com">Facebook</option>
+    </select>
+    <button id="openApp">Open App</button>
+    <div id="appContainer"></div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("openApp").addEventListener("click", openApp);
+        });
+
+        function openApp() {
+            const appUrl = document.getElementById("appSelect").value;
+            if (appUrl) {
+                window.open(appUrl, '_blank', 'noopener,noreferrer');
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+</body>
+</html>
